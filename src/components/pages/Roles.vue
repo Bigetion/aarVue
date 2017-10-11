@@ -82,7 +82,7 @@ export default {
       this.state.isAdd = condition
 
       if (condition) {
-        this.$validator.clean()
+        this.$validator.reset()
         this.errors.clear()
         this.input = {
           roleName: '',

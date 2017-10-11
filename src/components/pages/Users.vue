@@ -94,7 +94,7 @@ export default {
       this.state.isAdd = condition
       this.state.openDialog = condition
       if (condition) {
-        this.$validator.clean()
+        this.$validator.reset()
         this.errors.clear()
         this.input = {
           username: '',

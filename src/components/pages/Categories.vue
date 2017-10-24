@@ -52,9 +52,7 @@ export default {
       state: {
         isEdit: false
       },
-      input: {
-        
-      },
+      input: {},
       columns: [
         { text: "Category Name", value: "text", align: "left" },
         { text: "Description", value: "description", align: "left" },

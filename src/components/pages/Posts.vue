@@ -8,7 +8,24 @@
         </v-btn>
       </v-fab-transition>
     </v-toolbar>
-    <v-card flat class="grey lighten-3 mt-4">
+    <v-card flat class="grey lighten-3 mt-2">
+      <v-layout>
+          <v-flex xs12 sm6 md4 class="pa-2" v-for="item in postList">
+            <v-card>
+              <v-card-media :src="baseUrl+'image/get/12341'" height="200px">
+              </v-card-media>
+              <v-card-title primary-title>
+                <div>
+                  <h3 class="headline mb-0">{{item.post_title}}</h3>
+                  <div>{{item.description}}</div>
+                </div>
+              </v-card-title>
+              <v-card-actions>
+                <v-btn flat color="orange">Edit</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-flex>
+      </v-layout>
       <v-dialog v-model="state.openDialog" fullscreen transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark class="primary">
@@ -59,11 +76,11 @@
 </template>
 
 <script>
-import VueFroala from 'vue-froala-wysiwyg';
-import auth from '../../auth'
-import froala from '../../froala'
+import VueFroala from "vue-froala-wysiwyg";
+import auth from "../../auth";
+import froala from "../../froala";
 export default {
-  name: 'app',
+  name: "app",
   data() {
     return {
       state: {
@@ -73,89 +90,98 @@ export default {
       },
       config: froala.config,
       input: {
-        title: '',
-        content: '',
-        description: '',
-        featuredImage: ''
+        title: "",
+        content: "",
+        description: "",
+        featuredImage: ""
       },
+      postList: [],
       categories: [],
       categoryList: [],
       tags: [],
-      tagList: []
-    }
+      tagList: [],
+      baseUrl: process.env.API_URL
+    };
   },
   methods: {
+    getData() {
+      this.$http.post("posts/getData").then(response => {
+        if (!response.data.error_message) {
+          this.postList = response.data.data;
+        }
+      });
+    },
     getCategories() {
-      this.$http.post('terms/getData', {
-        type: 'category'
-      })
+      this.$http
+        .post("terms/getData", {
+          type: "category"
+        })
         .then(response => {
           if (!response.data.error_message) {
-            this.categoryList = response.data.data
+            this.categoryList = response.data.data;
           }
-        })
+        });
     },
     getTags() {
-      this.$http.post('terms/getData', {
-        type: 'tag'
-      })
+      this.$http
+        .post("terms/getData", {
+          type: "tag"
+        })
         .then(response => {
           if (!response.data.error_message) {
-            this.tagList = response.data.data
+            this.tagList = response.data.data;
           }
-        })
+        });
     },
     isAddClick(condition) {
-      this.state.isAdd = condition
-      this.state.openDialog = condition
+      this.state.isAdd = condition;
+      this.state.openDialog = condition;
       if (condition) {
-        this.$validator.reset()
-        this.errors.clear()
+        this.$validator.reset();
+        this.errors.clear();
         this.input = {
-          title: '',
-          content: '',
-          description: '',
-          featuredImage: ''
-        }
+          title: "",
+          content: "",
+          description: "",
+          featuredImage: ""
+        };
       }
     },
     isEditClick(condition, row) {
-      this.state.isEdit = condition
-      this.state.openDialog = condition
+      this.state.isEdit = condition;
+      this.state.openDialog = condition;
       if (condition) {
         this.input = {
-          title: '',
-          content: '',
-          description: '',
-          featuredImage: ''
-        }
+          title: "",
+          content: "",
+          description: "",
+          featuredImage: ""
+        };
       }
     },
     featuredImageClick() {
-      this.$modal.setFeaturedImage().then(response => {
-
-      }).catch(rejected => {
-
-      })
+      this.$modal
+        .setFeaturedImage()
+        .then(response => {})
+        .catch(rejected => {});
     },
     submit() {
       this.$validator.validateAll();
       if (!this.errors.any()) {
         if (this.state.isAdd) {
-
         }
 
         if (this.state.isEdit) {
-
         }
       }
     }
   },
   created() {
-    this.getCategories()
-    this.getTags()
+    this.getData();
+    this.getCategories();
+    this.getTags();
   }
-}
+};
 </script>
 
 <style lang="css">

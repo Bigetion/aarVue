@@ -52,9 +52,7 @@ export default {
       state: {
         isEdit: false
       },
-      input: {
-        
-      },
+      input: {},
       columns: [
         { text: "Tag Name", value: "text", align: "left" },
         { text: "Description", value: "description", align: "left" },
@@ -123,7 +121,8 @@ export default {
                 remove: null,
                 lower: true
               }),
-              description: this.input.description
+              description: this.input.description,
+              type: "tag"
             })
             .then(response => {
               if (response.data.success_message) {
@@ -139,7 +138,8 @@ export default {
                 remove: null,
                 lower: true
               }),
-              description: this.input.description
+              description: this.input.description,
+              type: "tag"
             })
             .then(response => {
               if (response.data.success_message) {

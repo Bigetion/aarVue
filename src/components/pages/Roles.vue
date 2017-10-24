@@ -14,7 +14,7 @@
           <td>{{ props.item.role_name }}</td>
           <td>{{ props.item.description }}</td>
           <td width="150">
-            <v-btn icon small class="teal--text">
+            <v-btn icon small class="teal--text" v-on:click.stop="isEditClick(true, props.item)">
               <v-icon>edit</v-icon>
             </v-btn>
             <v-btn v-if="props.item.id_role!=1 && props.item.id_role!=2" icon small class="red--text" @click="deleteClick(props.item)">
@@ -24,26 +24,25 @@
         </template>
       </v-data-table>
     </v-card>
-    <v-dialog v-model="state.isAdd" fullscreen transition="dialog-bottom-transition">
+    <v-dialog v-model="state.openDialog" fullscreen transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark class="primary">
           <v-toolbar-title>Add Role</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon @click.native="state.isAdd = false" dark>
+          <v-btn icon @click.native="state.openDialog = false" dark>
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <v-form v-model="valid" ref="form" class="pa-4">
           <div class="mx-2">
-          <v-text-field label="Role Name" name="roleName" v-model="input.roleName" :error-messages="errors.collect('roleName')" v-validate="'required'"></v-text-field>
+          <v-text-field label="Role Name" name="roleName" v-model="input.roleName" :error-messages="errors.collect('roleName')" v-validate="'required'" :disabled="input.idRole==1 || input.idRole==2"></v-text-field>
           <v-text-field label="Description" name="description" v-model="input.description" :error-messages="errors.collect('description')" v-validate="'required'" multi-line></v-text-field>
           </div>
           <div class="mt-3">
             <v-btn primary @click="submit()">Save</v-btn>
-            <v-btn error @click.native="state.isAdd = false">Cancel</v-btn>
+            <v-btn error @click.native="state.openDialog = false">Cancel</v-btn>
           </div>
         </v-form>
-        </v-list>
       </v-card>
     </v-dialog>
   </v-tabs>
@@ -55,77 +54,95 @@ export default {
     return {
       state: {
         isAdd: false,
-        isEdit: false
+        isEdit: false,
+        openDialog: false
       },
       input: {
-        roleName: '',
-        description: ''
+        roleName: "",
+        description: ""
       },
       columns: [
-        { text: 'Role Name', value: 'role_name', align: 'left' },
-        { text: 'Description', value: 'description', align: 'left' },
-        { text: 'Action', align: 'left', sortable: false }
+        { text: "Role Name", value: "role_name", align: "left" },
+        { text: "Description", value: "description", align: "left" },
+        { text: "Action", align: "left", sortable: false }
       ],
       roleList: []
     };
   },
   methods: {
     getRoleData() {
-      this.$http.post('roles/getData')
-        .then(response => {
-          if (!response.data.error_message) {
-            this.roleList = response.data.data
-          }
-        })
+      this.$http.post("roles/getData").then(response => {
+        if (!response.data.error_message) {
+          this.roleList = response.data.data;
+        }
+      });
     },
     isAddClick(condition) {
-      this.state.isAdd = condition
-
+      this.state.isAdd = condition;
+      this.state.openDialog = condition;
       if (condition) {
-        this.$validator.clean()
-        this.errors.clear()
+        this.$validator.reset();
+        this.errors.clear();
         this.input = {
-          roleName: '',
-          description: ''
-        }
+          roleName: "",
+          description: ""
+        };
       }
     },
-    isEditClick(condition) {
-      this.state.isEdit = condition
+    isEditClick(condition, row) {
+      this.state.isEdit = condition;
+      this.state.openDialog = condition;
+      if (condition) {
+        this.input = {
+          idRole: row.id_role,
+          roleName: row.role_name,
+          description: row.description
+        };
+      }
     },
     deleteClick(row) {
-      this.$modal.confirm({
-        message: 'Are you sure you want to delete?'
-      }).then(response => {
-        this.$http.post('roles/submitDelete', {
-          idRole: row.id_role
-        }).then(response => {
-          if (response.data.success_message) {
-            this.getRoleData()
-          }
+      this.$modal
+        .confirm({
+          message: "Are you sure you want to delete?"
         })
-      }).catch(error => { })
+        .then(response => {
+          this.$http
+            .post("roles/submitDelete", {
+              idRole: row.id_role
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                this.getRoleData();
+              }
+            });
+        })
+        .catch(error => {});
     },
     submit() {
       this.$validator.validateAll();
       if (!this.errors.any()) {
         if (this.state.isAdd) {
-          this.$http.post('roles/submitAdd', this.input).then(response => {
+          this.$http.post("roles/submitAdd", this.input).then(response => {
             if (response.data.success_message) {
-              this.state.isAdd = false
-              this.getRoleData()
+              this.isAddClick(false);
+              this.getRoleData();
             }
-          })
+          });
         }
 
         if (this.state.isEdit) {
-
+          this.$http.post("roles/submitEdit", this.input).then(response => {
+            if (response.data.success_message) {
+              this.isEditClick(false);
+              this.getRoleData();
+            }
+          });
         }
       }
     }
   },
   created() {
-    this.getRoleData()
+    this.getRoleData();
   }
 };
 </script>

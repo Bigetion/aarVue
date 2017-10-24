@@ -60,14 +60,14 @@ export default {
         openDialog: false
       },
       input: {
-        idUser: '',
-        username: '',
-        idRole: ''
+        idUser: "",
+        username: "",
+        idRole: ""
       },
       columns: [
-        { text: 'Username', value: 'username', align: 'left' },
-        { text: 'Role Name', value: 'role_name', align: 'left' },
-        { text: 'Action', align: 'left', sortable: false, maxWidth: '80px' }
+        { text: "Username", value: "username", align: "left" },
+        { text: "Role Name", value: "role_name", align: "left" },
+        { text: "Action", align: "left", sortable: false, maxWidth: "80px" }
       ],
       roleList: [],
       userList: []
@@ -75,90 +75,97 @@ export default {
   },
   methods: {
     getUserData() {
-      this.$http.post('users/getData')
-        .then(response => {
-          if (!response.data.error_message) {
-            this.userList = response.data.data
-          }
-        })
+      this.$http.post("users/getData").then(response => {
+        if (!response.data.error_message) {
+          this.userList = response.data.data;
+        }
+      });
     },
     getRoleData() {
-      this.$http.post('roles/getData')
-        .then(response => {
-          if (!response.data.error_message) {
-            this.roleList = response.data.data
-          }
-        })
+      this.$http.post("roles/getData").then(response => {
+        if (!response.data.error_message) {
+          this.roleList = response.data.data;
+        }
+      });
     },
     isAddClick(condition) {
-      this.state.isAdd = condition
-      this.state.openDialog = condition
+      this.state.isAdd = condition;
+      this.state.openDialog = condition;
       if (condition) {
-        this.$validator.clean()
-        this.errors.clear()
+        this.$validator.reset();
+        this.errors.clear();
         this.input = {
-          username: '',
-          idRole: ''
-        }
+          username: "",
+          idRole: ""
+        };
       }
     },
     isEditClick(condition, row) {
-      this.state.isEdit = condition
-      this.state.openDialog = condition
+      this.state.isEdit = condition;
+      this.state.openDialog = condition;
       if (condition) {
         this.input = {
           idUser: row.id_user,
           username: row.username,
           idRole: row.id_role
-        }
+        };
       }
     },
     deleteClick(row) {
-      this.$modal.confirm({
-        message: 'Are you sure you want to delete?'
-      }).then(response => {
-        this.$http.post('users/submitDelete', {
-          idUser: row.id_user
-        }).then(response => {
-          if (response.data.success_message) {
-            this.getUserData()
-          }
+      this.$modal
+        .confirm({
+          message: "Are you sure you want to delete?"
         })
-      }).catch(error => { })
+        .then(response => {
+          this.$http
+            .post("users/submitDelete", {
+              idUser: row.id_user
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                this.getUserData();
+              }
+            });
+        })
+        .catch(error => {});
     },
     submit() {
       this.$validator.validateAll();
       if (!this.errors.any()) {
         if (this.state.isAdd) {
-          this.$http.post('users/submitAdd', {
-            userName: this.input.username,
-            idRole: this.input.idRole
-          }).then(response => {
-            if (response.data.success_message) {
-              this.isAddClick(false)
-              this.getUserData()
-            }
-          })
+          this.$http
+            .post("users/submitAdd", {
+              userName: this.input.username,
+              idRole: this.input.idRole
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                this.isAddClick(false);
+                this.getUserData();
+              }
+            });
         }
 
         if (this.state.isEdit) {
-          this.$http.post('users/submitEdit', {
-            idUser: this.input.idUser,
-            userName: this.input.username,
-            idRole: this.input.idRole
-          }).then(response => {
-            if (response.data.success_message) {
-              this.isEditClick(false)
-              this.getUserData()
-            }
-          })
+          this.$http
+            .post("users/submitEdit", {
+              idUser: this.input.idUser,
+              userName: this.input.username,
+              idRole: this.input.idRole
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                this.isEditClick(false);
+                this.getUserData();
+              }
+            });
         }
       }
     }
   },
   created() {
-    this.getUserData()
-    this.getRoleData()
+    this.getUserData();
+    this.getRoleData();
   }
 };
 </script>

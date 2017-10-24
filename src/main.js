@@ -121,7 +121,6 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-
 //Build app into #app div
 const app = new Vue({
   router,

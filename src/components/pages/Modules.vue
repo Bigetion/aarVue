@@ -12,7 +12,7 @@
             </v-toolbar>
             <v-divider></v-divider>
             <v-list dense subheader class="white">
-              <v-list-tile avatar @click="" v-for="childItem in item.controller" v-bind:key="childItem">
+              <v-list-tile avatar v-for="childItem in item.controller" v-bind:key="childItem">
                 <v-list-tile-content>
                   <v-list-tile-title>
                     Controller_{{childItem}}

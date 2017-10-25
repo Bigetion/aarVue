@@ -22,7 +22,6 @@ import './stylus/main.styl'
 import Vuetify from 'vuetify'
 
 import Modal from 'vuejs-modal'
-import VueBase64FileUpload from 'vue-base64-file-upload'
 
 // Import components
 import VConfirm from './components/directives/Confirmation.vue'
@@ -68,7 +67,6 @@ Vue.use(Modal, {
 Vue.use(VueFroala)
 Vue.use(Croppa)
 Vue.component('image-uploader', ImageUploader)
-Vue.component('base64-upload', VueBase64FileUpload)
 // Routes
 export var router = new Router({
   mode: 'history',

@@ -26,52 +26,50 @@
                 </div>
               </v-card-title>
               <v-card-actions>
-                <v-btn warning>Edit</v-btn>
+                <v-btn warning @click.native.stop="isEditClick(true, item)">Edit</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
       </v-layout>
       <v-dialog v-model="state.openDialog" fullscreen transition="dialog-bottom-transition">
-      <v-card>
-        <v-toolbar dark class="primary">
-          <v-toolbar-title>{{state.isAdd ? 'Add':'Edit'}} Post</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon @click.native="state.openDialog = false" dark>
-            <v-icon>close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-container fluid grid-list-md>
-          <v-form v-model="valid" ref="form" class="pa-4">
-          <v-layout row wrap>
-            <v-flex xs12 sm8 md9>
+        <v-card>
+          <v-toolbar dark class="primary">
+            <v-toolbar-title>{{state.isAdd ? 'Add':'Edit'}} Post</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon @click.native="state.openDialog = false" dark>
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-container fluid grid-list-md>
+            <v-form v-model="valid" ref="form" class="pa-4">
+            <v-layout row wrap>
+              <v-flex xs12 sm8 md9>
+                    <div class="mx-2">
+                      <v-text-field label="Title" name="Title" v-model="input.title" :error-messages="errors.collect('Title')" v-validate="'required'" class="mb-4"></v-text-field>
+                      <froala :tag="'textarea'" :config="config" v-model="input.content" name="Content" :error-messages="errors.collect('Content')" v-validate="'required'"></froala>
+                      <v-text-field textarea label="Description" name="Description" v-model="input.description" :error-messages="errors.collect('Description')" v-validate="'required'" multi-line></v-text-field>
+                    </div>
+              </v-flex>
+              <v-flex xs12 sm4 md3>
+                <v-card flat>
                   <div class="mx-2">
-                    <v-text-field label="Title" name="Title" v-model="input.title" :error-messages="errors.collect('Title')" v-validate="'required'" class="mb-4"></v-text-field>
-                    <froala :tag="'textarea'" :config="config" v-model="input.content" name="Content" :error-messages="errors.collect('Content')" v-validate="'required'"></froala>
-                    <v-text-field textarea label="Description" name="Description" v-model="input.description" :error-messages="errors.collect('Description')" v-validate="'required'" multi-line></v-text-field>
+                    <v-select label="Categories" v-bind:items="categoryList" v-model="categories" multiple chips persistent-hint class="mb-2"></v-select>
+                    <v-select label="Tags" v-bind:items="tagList" v-model="tags" tags chips class="mb-4"></v-select>
                   </div>
-            </v-flex>
-            <v-flex xs12 sm4 md3>
-              <v-card flat>
-                <div class="mx-2">
-                <v-select label="Categories" v-bind:items="categoryList" v-model="categories" multiple chips persistent-hint class="mb-2"></v-select>
-                <v-select label="Tags" v-bind:items="tagList" v-model="tags" tags chips class="mb-4"></v-select>
-                </div>
-                <v-card-media src="/static/doc-images/cards/desert.jpg" height="200px" v-if="false">
-                </v-card-media>
-              </v-card>
-            </v-flex>
-            <v-flex xs12>
-              <div class="mt-3">
-                  <v-btn primary @click="submit()">Save</v-btn>
-                  <v-btn error @click.native="state.openDialog = false">Cancel</v-btn>
-                </div>
-            </v-flex>
-          </v-layout>
-          </v-form>
-        </v-container>
-        </v-list>
-      </v-card>
-    </v-dialog>
+                </v-card>
+              </v-flex>
+              <v-flex xs12>
+                <div class="mt-3">
+                    <v-btn primary @click="submit()">Save</v-btn>
+                    <v-btn error @click.native="state.openDialog = false">Cancel</v-btn>
+                  </div>
+              </v-flex>
+            </v-layout>
+            </v-form>
+          </v-container>
+          </v-list>
+        </v-card>
+      </v-dialog>
     </v-card>
   </v-tabs>
 </template>
@@ -80,6 +78,7 @@
 import VueFroala from "vue-froala-wysiwyg";
 import auth from "../../auth";
 import froala from "../../froala";
+var slugify = require("slugify");
 export default {
   name: "app",
   data() {
@@ -93,8 +92,7 @@ export default {
       input: {
         title: "",
         content: "",
-        description: "",
-        featuredImage: ""
+        description: ""
       },
       postList: [],
       categories: [],
@@ -105,6 +103,11 @@ export default {
     };
   },
   methods: {
+    onCreated() {
+      this.getData();
+      this.getCategories();
+      this.getTags();
+    },
     getData() {
       this.$http.post("posts/getData").then(response => {
         if (!response.data.error_message) {
@@ -143,9 +146,10 @@ export default {
         this.input = {
           title: "",
           content: "",
-          description: "",
-          featuredImage: ""
+          description: ""
         };
+        this.categories = [];
+        this.tags = [];
       }
     },
     isEditClick(condition, row) {
@@ -153,43 +157,129 @@ export default {
       this.state.openDialog = condition;
       if (condition) {
         this.input = {
-          title: "",
-          content: "",
-          description: "",
-          featuredImage: ""
+          id: row.id_post,
+          title: row.post_title,
+          content: row.post_content,
+          description: row.description
         };
+
+        this.$http
+          .post("terms/getData", { id: row.post_categories.split(",") })
+          .then(response => {
+            if (!response.data.error_message) {
+              this.categories = response.data.data;
+            }
+          });
+
+        this.$http
+          .post("terms/getData", { type: "tag", id: row.post_tags.split(",") })
+          .then(response => {
+            if (!response.data.error_message) {
+              this.tags = response.data.data;
+            }
+          });
       }
     },
     featuredImageClick(item) {
       this.$modal
         .featuredImage()
         .then(thumbnail => {
-          this.$http.post("posts/setFeaturedImage", {
-            idPost:item.id_post,
-            thumbnail: thumbnail
-          }).then(response => {
-            if (!response.data.error_message) {
-              item.thumbnail = thumbnail;
-            }
-          });
+          this.$http
+            .post("posts/setFeaturedImage", {
+              idPost: item.id_post,
+              thumbnail: thumbnail
+            })
+            .then(response => {
+              if (!response.data.error_message) {
+                item.thumbnail = thumbnail;
+              }
+            });
         })
         .catch(rejected => {});
     },
     submit() {
       this.$validator.validateAll();
       if (!this.errors.any()) {
-        if (this.state.isAdd) {
-        }
+        let categoriesIdArray = [];
+        this.categories.forEach(item => {
+          categoriesIdArray.push(item.id);
+        });
+        let tagsIdArray = [];
+        let tagsIdPromiseAll = [];
+        this.tags.forEach(item => {
+          if (item.id) {
+            tagsIdArray.push(item.id);
+          } else {
+            tagsIdPromiseAll.push(
+              this.$http.post("terms/submitAdd", {
+                name: item,
+                slug: slugify(item, {
+                  remove: null,
+                  lower: true
+                }),
+                description: "",
+                type: "tag"
+              })
+            );
+          }
+        });
+        Promise.all(tagsIdPromiseAll).then(response => {
+          let categoriesId = categoriesIdArray.join(",");
+          for (var i = 0; i < tagsIdPromiseAll.length; i++) {
+            if (response[i].data.success_message) {
+              tagsIdArray.push(response[i].data.id);
+            }
+          }
+          let tagsId = tagsIdArray.join(",");
 
-        if (this.state.isEdit) {
-        }
+          if (this.state.isAdd) {
+            this.$http
+              .post("posts/submitAdd", {
+                postTitle: this.input.title,
+                postTitleSlug: slugify(this.input.title, {
+                  remove: null,
+                  lower: true
+                }),
+                postContent: this.input.content,
+                description: this.input.description,
+                postCategories: categoriesId,
+                postTags: tagsId
+              })
+              .then(response => {
+                if (response.data.success_message) {
+                  this.isAddClick(false);
+                  this.onCreated();
+                }
+              });
+          }
+
+          if (this.state.isEdit) {
+            this.$http
+              .post("posts/submitEdit", {
+                idPost: this.input.id,
+                postTitle: this.input.title,
+                postTitleSlug: slugify(this.input.title, {
+                  remove: null,
+                  lower: true
+                }),
+                postContent: this.input.content,
+                description: this.input.description,
+                postCategories: categoriesId,
+                postTags: tagsId
+              })
+              .then(response => {
+                if (response.data.success_message) {
+                  this.isEditClick(false);
+                  this.onCreated();
+                }
+              });
+          }
+        });
       }
     }
   },
   created() {
-    this.getData();
-    this.getCategories();
-    this.getTags();
+    this.onCreated();
   }
 };
 </script>

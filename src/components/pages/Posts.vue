@@ -9,10 +9,15 @@
       </v-fab-transition>
     </v-toolbar>
     <v-card flat class="grey lighten-3 mt-2">
-      <v-layout>
-          <v-flex xs12 sm6 md4 class="pa-2" v-for="item in postList">
+      <v-layout row wrap>
+          <v-flex xs12 sm12 md6 class="pa-2" v-for="item in postList">
             <v-card>
-              <v-card-media :src="baseUrl+'image/get/12341'" height="200px">
+              <v-card-media :src="baseUrl+'image/get/featured/thumbs/'+item.thumbnail" height="200px">
+                <v-fab-transition>
+                  <v-btn @click="featuredImageClick(item)" class="grey" fab dark small absolute bottom right style="margin-bottom:30px;margin-right:-5px">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </v-fab-transition>
               </v-card-media>
               <v-card-title primary-title>
                 <div>
@@ -21,7 +26,7 @@
                 </div>
               </v-card-title>
               <v-card-actions>
-                <v-btn flat color="orange">Edit</v-btn>
+                <v-btn warning>Edit</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -53,10 +58,6 @@
                 </div>
                 <v-card-media src="/static/doc-images/cards/desert.jpg" height="200px" v-if="false">
                 </v-card-media>
-                <v-card-actions>
-                  <v-btn class="blue--text" @click="featuredImageClick()">Set featured image</v-btn>
-                  <v-btn class="orange--text" v-if="false">Remove featured image</v-btn>
-                </v-card-actions>
               </v-card>
             </v-flex>
             <v-flex xs12>
@@ -159,10 +160,19 @@ export default {
         };
       }
     },
-    featuredImageClick() {
+    featuredImageClick(item) {
       this.$modal
-        .setFeaturedImage()
-        .then(response => {})
+        .featuredImage()
+        .then(thumbnail => {
+          this.$http.post("posts/setFeaturedImage", {
+            idPost:item.id_post,
+            thumbnail: thumbnail
+          }).then(response => {
+            if (!response.data.error_message) {
+              item.thumbnail = thumbnail;
+            }
+          });
+        })
         .catch(rejected => {});
     },
     submit() {

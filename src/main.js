@@ -22,11 +22,12 @@ import './stylus/main.styl'
 import Vuetify from 'vuetify'
 
 import Modal from 'vuejs-modal'
-import confirm from 'vuejs-modal/lib/confirm.vue'
+import VueBase64FileUpload from 'vue-base64-file-upload'
 
 // Import components
 import VConfirm from './components/directives/Confirmation.vue'
 import VFeaturedImage from './components/directives/FeaturedImage.vue'
+import ImageUploader from './components/directives/ImageUploader.vue'
 
 import Login from './components/pages/Login.vue'
 import Modules from './components/pages/Modules.vue'
@@ -51,7 +52,7 @@ Vue.use(Modal, {
   id: 'modal',
   modals: {
     confirm: VConfirm,
-    setFeaturedImage: VFeaturedImage
+    featuredImage: VFeaturedImage
   },
   style: {
     position: 'fixed',
@@ -66,7 +67,8 @@ Vue.use(Modal, {
 
 Vue.use(VueFroala)
 Vue.use(Croppa)
-
+Vue.component('image-uploader', ImageUploader)
+Vue.component('base64-upload', VueBase64FileUpload)
 // Routes
 export var router = new Router({
   mode: 'history',

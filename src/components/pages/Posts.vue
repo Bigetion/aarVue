@@ -27,9 +27,13 @@
               </v-card-title>
               <v-card-actions>
                 <v-btn warning @click.native.stop="isEditClick(true, item)">Edit</v-btn>
+                <v-btn error @click="deleteClick(item)">Delete</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
+          <v-card-text v-if="postList.length==0">
+            <p class="mt-2 text-xs-center">No data available</p>
+          </v-card-text>
       </v-layout>
       <v-dialog v-model="state.openDialog" fullscreen transition="dialog-bottom-transition">
         <v-card>
@@ -196,6 +200,24 @@ export default {
             });
         })
         .catch(rejected => {});
+    },
+    deleteClick(row) {
+      this.$modal
+        .confirm({
+          message: "Are you sure you want to delete?"
+        })
+        .then(response => {
+          this.$http
+            .post("posts/submitDelete", {
+              idPost: row.id_post
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                this.getData();
+              }
+            });
+        })
+        .catch(error => {});
     },
     submit() {
       this.$validator.validateAll();

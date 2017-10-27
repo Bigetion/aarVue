@@ -1,12 +1,15 @@
 <template id="login">
-  <v-card align-center class="login">
+  <v-card align-center class="login mt-5 elevation-10">
     <v-container class="login">
       <h4>AAR Framework</h4>
       <v-form v-model="valid" ref="form">
+        <v-alert error :value="message.error">
+          {{message.error}}
+        </v-alert>
         <div class="mx-2">
-          <v-text-field label="Username" name="username" v-model="input.username" :error-messages="errors.collect('username')" v-validate="'required'">
+          <v-text-field label="Username" name="Username" v-model="input.username" :error-messages="errors.collect('Username')" v-validate="'required'">
           </v-text-field>
-          <v-text-field label="Password" name="password" v-model="input.password" :error-messages="errors.collect('password')" type="password" v-validate="'required'">
+          <v-text-field label="Password" name="Password" v-model="input.password" :error-messages="errors.collect('Password')" type="password" v-validate="'required'">
           </v-text-field>
         </div>
         <div class="mt-3">
@@ -19,15 +22,19 @@
 
 
 <script>
-import auth from '../../auth'
+import auth from "../../auth";
 
 export default {
   data() {
     return {
       error: null,
       input: {
-        username: '',
-        password: ''
+        username: "",
+        password: "",
+        errorMessage: ""
+      },
+      message: {
+        error: ""
       }
     };
   },
@@ -35,22 +42,26 @@ export default {
   methods: {
     submit() {
       this.$validator.validateAll();
+      this.message.error = "";
       if (!this.errors.any()) {
-        this.$http.post('login', {
-          username: this.input.username,
-          password: this.input.password
-        })
+        this.$http
+          .post("login", {
+            username: this.input.username,
+            password: this.input.password
+          })
           .then(response => {
             if (response.data.success_message) {
-              localStorage.setItem('token', response.data.jwt);
+              localStorage.setItem("token", response.data.jwt);
               auth.user.authenticated = true;
               window.location.reload();
-              this.$router.push('/');
+              this.$router.push("/");
+            } else {
+              this.message.error = "Invalid username and password";
             }
           })
           .catch(function(error) {
             console.log(error);
-          })
+          });
       }
     }
   },

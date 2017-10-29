@@ -16,7 +16,7 @@
           <v-flex xs12 sm12 md12>
             <v-layout row wrap>
               <v-flex
-                xs6 sm4 md3
+                xs12 sm4 md3
                 v-for="img in imageList"
                 :key="img"
               >
@@ -35,7 +35,7 @@
                   </v-card-media>
                 </v-card>
               </v-flex>
-              <v-flex xs6 sm4 md3>
+              <v-flex xs12 sm4 md3>
                 <image-uploader @input="handleFileUpload" :value="src"></image-uploader>
               </v-flex>
             </v-layout>

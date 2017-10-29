@@ -5,7 +5,7 @@
     </v-toolbar>
     <v-layout row wrap class="grey lighten-3 mt-2">
       <v-flex md4>
-        <v-card class="mx-2 my-2 pa-2">
+        <v-card class="mx-2 mt-2 px-2 pt-2">
           <v-text-field label="Username" v-model="userInfo.name" :disabled="true"></v-text-field>
           <v-text-field label="Role Name" v-model="userInfo.role" :disabled="true"></v-text-field>
         </v-card>

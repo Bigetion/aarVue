@@ -15,7 +15,7 @@
             <v-text-field label="Name" name="name" v-model="input.name" :error-messages="errors.collect('name')" v-validate="'required'"></v-text-field>
             <v-text-field label="Description" name="description" v-model="input.description" :error-messages="errors.collect('description')" multi-line></v-text-field>
             </div>
-            <div class="mt-3">
+            <div class="my-3">
               <v-btn primary @click="submit()">{{state.isEdit ? "Save":"Add"}}</v-btn>
               <v-btn error v-if="state.isEdit" @click="isEditClick(false)">Cancel</v-btn>
             </div>
@@ -24,7 +24,16 @@
       </v-flex>
       <v-flex md8>
         <v-card class="mx-2 my-2">
-          <v-data-table flat v-bind:headers="columns" :items="tagList" hide-actions class="elevation-1">
+          <v-card-title>
+            <v-text-field
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+              v-model="search"
+            ></v-text-field>
+          </v-card-title>
+          <v-data-table flat :headers="columns" :items="tagList" :search="search" class="elevation-1" :rows-per-page-items="[10,25, 50, 100, {text:'All',value: -1}]">
             <template slot="items" scope="props">
               <td>{{ props.item.text }}</td>
               <td>{{ props.item.description }}</td>
@@ -58,6 +67,7 @@ export default {
         { text: "Description", value: "description", align: "left" },
         { text: "Action", align: "left", sortable: false }
       ],
+      search: "",
       tagList: []
     };
   },

@@ -36,15 +36,15 @@
           </v-card-text>
       </v-layout>
       <v-dialog v-model="state.openDialog" fullscreen transition="dialog-bottom-transition">
-        <v-card>
-          <v-toolbar dark class="primary">
+        <v-card class="m-container">
+          <v-toolbar dark fixed class="primary" :style="{zIndex:1000}">
             <v-toolbar-title>{{state.isAdd ? 'Add':'Edit'}} Post</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon @click.native="state.openDialog = false" dark>
               <v-icon>close</v-icon>
             </v-btn>
           </v-toolbar>
-          <v-container fluid grid-list-md>
+          <v-container fluid grid-list-md :style="{paddingTop:'50px'}">
             <v-form v-model="valid" ref="form" class="pa-4">
             <v-layout row wrap>
               <v-flex xs12 sm8 md9>
@@ -307,5 +307,8 @@ export default {
 </script>
 
 <style lang="css">
-
+  .m-container {
+    height: inherit !important;
+    overflow: auto;
+  }
 </style>

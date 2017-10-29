@@ -3,14 +3,14 @@
     <v-container class="login">
       <h4>AAR Framework</h4>
       <v-form v-model="valid" ref="form">
-        <v-alert error :value="message.error">
-          {{message.error}}
-        </v-alert>
         <div class="mx-2">
           <v-text-field label="Username" name="Username" v-model="input.username" :error-messages="errors.collect('Username')" v-validate="'required'">
           </v-text-field>
           <v-text-field label="Password" name="Password" v-model="input.password" :error-messages="errors.collect('Password')" type="password" v-validate="'required'">
           </v-text-field>
+          <v-alert error :value="message.error">
+            {{message.error}}
+          </v-alert>
         </div>
         <div class="mt-3">
           <v-btn primary @click="submit()">Login</v-btn>

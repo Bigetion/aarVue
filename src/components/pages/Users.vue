@@ -30,7 +30,7 @@
         <v-toolbar dark class="primary">
           <v-toolbar-title>{{state.isAdd ? 'Add':'Edit'}} User</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon @click.native="state.openDialog = false" dark>
+          <v-btn icon @click.native="state.openDialog = state.isAdd = state.isEdit = false" dark>
             <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -41,7 +41,7 @@
           </div>
           <div class="mt-3">
             <v-btn primary @click="submit()">Save</v-btn>
-            <v-btn error @click.native="state.openDialog = false">Cancel</v-btn>
+            <v-btn error @click.native="state.openDialog = state.isAdd = state.isEdit = false">Cancel</v-btn>
           </div>
       </v-form>
         </v-list>

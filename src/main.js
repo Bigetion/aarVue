@@ -18,10 +18,13 @@ import VueFroala from 'vue-froala-wysiwyg'
 import 'vue-croppa/dist/vue-croppa.css'
 import Croppa from 'vue-croppa'
 
+import 'vue-multiselect/dist/vue-multiselect.min.css'
+
 import './stylus/main.styl'
 import Vuetify from 'vuetify'
 
 import Modal from 'vuejs-modal'
+import Multiselect from 'vue-multiselect'
 
 // Import components
 import VConfirm from './components/directives/Confirmation.vue'
@@ -67,6 +70,7 @@ Vue.use(Modal, {
 Vue.use(VueFroala)
 Vue.use(Croppa)
 Vue.component('image-uploader', ImageUploader)
+Vue.component('multiselect', Multiselect)
 // Routes
 export var router = new Router({
   mode: 'history',

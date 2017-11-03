@@ -57,8 +57,16 @@
               <v-flex xs12 sm4 md3>
                 <v-card flat>
                   <div class="mx-2">
-                    <v-select label="Categories" v-bind:items="categoryList" v-model="categories" multiple chips persistent-hint class="mb-2"></v-select>
-                    <v-select label="Tags" v-bind:items="tagList" v-model="tags" tags chips class="mb-4"></v-select>
+                    <div class="mt-4">
+                      <label class="subheading pb-3">Categories</label>
+                      <multiselect class="mt-2" select-label="" deselect-label="" v-model="categories" :options="categoryList" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Choose categories" label="text" track-by="id"></multiselect>
+                    </div>
+                    <div class="mt-4">
+                      <label class="subheading pb-3">Tags</label>
+                      <multiselect class="mt-2" select-label="" deselect-label=""v-model="tags" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="text" track-by="id" :options="tagList" :multiple="true" :taggable="true" @tag="addTag" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
+                    </div>
+                    <!-- <v-select label="Categories" v-bind:items="categoryList" v-model="categories" multiple chips persistent-hint class="mb-2"></v-select>
+                    <v-select label="Tags" v-bind:items="tagList" v-model="tags" tags chips class="mb-4"></v-select> -->
                   </div>
                 </v-card>
               </v-flex>
@@ -111,6 +119,28 @@ export default {
       this.getData();
       this.getCategories();
       this.getTags();
+    },
+    addTag (newTag) {
+      this.$http
+            .post("terms/submitAdd", {
+              name: newTag,
+              slug: slugify(newTag, {
+                remove: null,
+                lower: true
+              }),
+              description: "-",
+              type: "tag"
+            })
+            .then(response => {
+              if (response.data.success_message) {
+                let tag = {
+                  id: response.data.id,
+                  text: newTag
+                }
+                this.tagList.push(tag)
+                this.tags.push(tag)
+              }
+            });
     },
     getData() {
       this.$http.post("posts/getData").then(response => {
@@ -168,7 +198,7 @@ export default {
         };
 
         this.$http
-          .post("terms/getData", { id: row.post_categories.split(",") })
+          .post("terms/getData", { type:"category", id: row.post_categories.split(",") })
           .then(response => {
             if (!response.data.error_message) {
               this.categories = response.data.data;
@@ -227,34 +257,13 @@ export default {
           categoriesIdArray.push(item.id);
         });
         let tagsIdArray = [];
-        let tagsIdPromiseAll = [];
         this.tags.forEach(item => {
-          if (item.id) {
-            tagsIdArray.push(item.id);
-          } else {
-            tagsIdPromiseAll.push(
-              this.$http.post("terms/submitAdd", {
-                name: item,
-                slug: slugify(item, {
-                  remove: null,
-                  lower: true
-                }),
-                description: "",
-                type: "tag"
-              })
-            );
-          }
+          tagsIdArray.push(item.id);
         });
-        Promise.all(tagsIdPromiseAll).then(response => {
-          let categoriesId = categoriesIdArray.join(",");
-          for (var i = 0; i < tagsIdPromiseAll.length; i++) {
-            if (response[i].data.success_message) {
-              tagsIdArray.push(response[i].data.id);
-            }
-          }
-          let tagsId = tagsIdArray.join(",");
+        let categoriesId = categoriesIdArray.join(",");
+        let tagsId = tagsIdArray.join(",");
 
-          if (this.state.isAdd) {
+        if (this.state.isAdd) {
             this.$http
               .post("posts/submitAdd", {
                 postTitle: this.input.title,
@@ -296,7 +305,36 @@ export default {
                 }
               });
           }
-        });
+        // let tagsIdArray = [];
+        // let tagsIdPromiseAll = [];
+        // this.tags.forEach(item => {
+        //   if (item.id) {
+        //     tagsIdArray.push(item.id);
+        //   } else {
+        //     tagsIdPromiseAll.push(
+        //       this.$http.post("terms/submitAdd", {
+        //         name: item,
+        //         slug: slugify(item, {
+        //           remove: null,
+        //           lower: true
+        //         }),
+        //         description: "",
+        //         type: "tag"
+        //       })
+        //     );
+        //   }
+        // });
+        // Promise.all(tagsIdPromiseAll).then(response => {
+        //   let categoriesId = categoriesIdArray.join(",");
+        //   for (var i = 0; i < tagsIdPromiseAll.length; i++) {
+        //     if (response[i].data.success_message) {
+        //       tagsIdArray.push(response[i].data.id);
+        //     }
+        //   }
+        //   let tagsId = tagsIdArray.join(",");
+
+          
+        // });
       }
     }
   },
@@ -307,8 +345,8 @@ export default {
 </script>
 
 <style lang="css">
-  .m-container {
-    height: inherit !important;
-    overflow: auto;
-  }
+.m-container {
+  height: inherit !important;
+  overflow: auto;
+}
 </style>

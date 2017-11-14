@@ -65,8 +65,6 @@
                       <label class="subheading pb-3">Tags</label>
                       <multiselect class="mt-2" select-label="" deselect-label=""v-model="tags" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="text" track-by="id" :options="tagList" :multiple="true" :taggable="true" @tag="addTag" :close-on-select="false" :clear-on-select="false" :hide-selected="true"></multiselect>
                     </div>
-                    <!-- <v-select label="Categories" v-bind:items="categoryList" v-model="categories" multiple chips persistent-hint class="mb-2"></v-select>
-                    <v-select label="Tags" v-bind:items="tagList" v-model="tags" tags chips class="mb-4"></v-select> -->
                   </div>
                 </v-card>
               </v-flex>

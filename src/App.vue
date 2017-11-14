@@ -103,6 +103,11 @@ export default {
         path: 'permissions'
       },
       {
+        icon: 'playlist_add_check',
+        title: 'Gump',
+        path: 'gump'
+      },
+      {
         icon: 'library_books',
         title: 'Posts',
         items: [

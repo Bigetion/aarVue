@@ -25,6 +25,7 @@ import Vuetify from 'vuetify'
 
 import Modal from 'vuejs-modal'
 import Multiselect from 'vue-multiselect'
+import Toasted from 'vue-toasted'
 
 // Import components
 import VConfirm from './components/directives/Confirmation.vue'
@@ -34,6 +35,7 @@ import ImageUploader from './components/directives/ImageUploader.vue'
 import Login from './components/pages/Login.vue'
 import Modules from './components/pages/Modules.vue'
 import Permissions from './components/pages/Permissions.vue'
+import Gump from './components/pages/Gump.vue'
 import Roles from './components/pages/Roles.vue'
 import Users from './components/pages/Users.vue'
 import Profile from './components/pages/Profile.vue'
@@ -69,6 +71,7 @@ Vue.use(Modal, {
 
 Vue.use(VueFroala)
 Vue.use(Croppa)
+Vue.use(Toasted)
 Vue.component('image-uploader', ImageUploader)
 Vue.component('multiselect', Multiselect)
 // Routes
@@ -78,6 +81,7 @@ export var router = new Router({
     { path: '/', name: 'modules', component: Modules, meta: { requiresAuth: true } },
     { path: '/login', name: 'login', component: Login, meta: { checksAuth: true } },
     { path: '/permissions', name: 'permissions', component: Permissions, meta: { requiresAuth: true } },
+    { path: '/gump', name: 'gump', component: Gump, meta: { requiresAuth: true } },
     { path: '/roles', name: 'roles', component: Roles, meta: { requiresAuth: true } },
     { path: '/users', name: 'users', component: Users, meta: { requiresAuth: true } },
     { path: '/posts', name: 'posts', component: Posts, meta: { requiresAuth: true } },

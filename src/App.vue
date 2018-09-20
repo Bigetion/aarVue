@@ -35,7 +35,6 @@
           </v-list-tile>
         </v-list-group>
       </v-list>
-      </v-list>
     </v-navigation-drawer>
     <v-toolbar v-if="user.authenticated" class="indigo" dark fixed>
       <v-toolbar-title>

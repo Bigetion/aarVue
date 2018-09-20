@@ -3,5 +3,5 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_URL: '"http://localhost:8888/aarAPI/"'
+  API_URL: '"http://localhost/aarAPI/"'
 })

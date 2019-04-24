@@ -25,7 +25,7 @@
                     <v-icon>check_circle</v-icon>
                   </p>
                   <v-card-media
-                    :src="baseUrl + 'thumbs/' + img"
+                    :src="baseUrl + img"
                     height="150px"
                     @click="setImage(img)"
                   >
@@ -66,7 +66,7 @@ export default {
   methods: {
     getData() {
       this.$http.post("image/getAll", { path: "featured" }).then(response => {
-        this.imageList = response.data.images;
+        this.imageList = response.data.images.map(item => item.name);
       });
     },
     setImage(img) {
